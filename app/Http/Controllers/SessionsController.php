@@ -15,8 +15,8 @@ class SessionsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('guest',[
-            'only'=>['create']
+        $this->middleware('guest', [
+            'only' => ['create']
         ]);
     }
 
@@ -40,10 +40,16 @@ class SessionsController extends Controller
             'password' => 'required'
         ]);
 
-        if (Auth::attempt($credentials,$request->has('remember'))) {
-            session()->flash('success', '欢迎回来');
-            $fallback = redirect()->route('users.show', Auth::user());
-            return redirect()->intended($fallback);
+        if (Auth::attempt($credentials, $request->has('remember'))) {
+            if (Auth::user()->activated) {
+                session()->flash('success', '欢迎回来');
+                $fallback = redirect()->route('users.show', Auth::user());
+                return redirect()->intended($fallback);
+            } else {
+                Auth::logout();
+                session()->flash('warning', '您的账号尚未激活，请检查邮箱中的邮件进行激活');
+                return redirect('/');
+            }
         } else {
             session()->flash('danger', '很抱歉，邮箱和密码不匹配');
             return redirect()->back()->withInput();
@@ -57,7 +63,7 @@ class SessionsController extends Controller
     public function destroy()
     {
         Auth::logout();
-        session()->flash('success','您已成功推出');
+        session()->flash('success', '您已成功推出');
         return redirect('login');
     }
 }

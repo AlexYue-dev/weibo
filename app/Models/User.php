@@ -60,4 +60,9 @@ class User extends Authenticatable
         });
 
     }
+
+    public function statuses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Status::class);
+    }
 }

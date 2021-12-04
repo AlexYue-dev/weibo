@@ -16,6 +16,19 @@ use DB;
 
 class PasswordController extends Controller
 {
+    public function __construct()
+    {
+        // 限流 重置页面每分钟最多访问两次
+        $this->middleware('throttle:2,1',[
+            'only'=> ['showLinkRequestForm'],
+        ]);
+
+        // 发送邮件接口每十分钟发送三次
+        $this->middleware('throttle:3,10', [
+            'only' => ['sendResetLinkEmail']
+        ]);
+    }
+
     /**
      * 跳转到发送邮件界面
      * @return Application|Factory|View

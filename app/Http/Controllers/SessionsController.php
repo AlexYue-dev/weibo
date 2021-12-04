@@ -21,7 +21,7 @@ class SessionsController extends Controller
         ]);
 
         // 登陆限流 每十分钟最多登陆十次
-        $this->middleware('throttle:10,10', [
+        $this->middleware('throttle:100,10', [
             'only' => ['store']
         ]);
     }

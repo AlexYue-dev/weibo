@@ -27,7 +27,7 @@ class UsersController extends Controller
         ]);
 
         // 限流 一个小时内只能提交 10 次请求；
-        $this->middleware('throttle:10,60', [
+        $this->middleware('throttle:100,60', [
             'only' => ['store']
         ]);
 
@@ -141,7 +141,7 @@ class UsersController extends Controller
     {
         $view = 'emails.confirm';
         $data = compact('user');
-        $to = $user->emial;
+        $to = $user->email;
         $subject = "感谢注册 Blog 应用！请确认你的邮箱。";
 
         Mail::send($view, $data, function ($message) use ($to, $subject) {

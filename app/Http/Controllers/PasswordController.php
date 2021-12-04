@@ -19,12 +19,12 @@ class PasswordController extends Controller
     public function __construct()
     {
         // 限流 重置页面每分钟最多访问两次
-        $this->middleware('throttle:2,1',[
+        $this->middleware('throttle:20,2',[
             'only'=> ['showLinkRequestForm'],
         ]);
 
         // 发送邮件接口每十分钟发送三次
-        $this->middleware('throttle:3,10', [
+        $this->middleware('throttle:20,10', [
             'only' => ['sendResetLinkEmail']
         ]);
     }
@@ -127,7 +127,7 @@ class PasswordController extends Controller
                 session()->flash('danger', 'token错误');
             }
             // 5.3 一切正常，更新用户密码
-            $user->update(['passsword' => bcrypt($request->password)]);
+            $user->update(['password' => bcrypt($request->password)]);
             // 5.4 提示用户更新密码成功
             session()->flash('success', '密码更新成功');
             return redirect()->route('login');

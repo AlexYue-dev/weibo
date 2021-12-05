@@ -55,10 +55,9 @@ class User extends Authenticatable
     public static function boot()
     {
         parent::boot();
-        static::creating(function ($user){
+        static::creating(function ($user) {
             $user->activation_token = Str::random(10);
         });
-
     }
 
     public function statuses(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -66,9 +65,41 @@ class User extends Authenticatable
         return $this->hasMany(Status::class);
     }
 
-    public function feed()
+    public function feed(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->statuses()->orderBy('created_at','desc');
+        return $this->statuses()->orderBy('created_at', 'desc');
+    }
+
+    public function followers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'followers', 'user_id', 'follower_id');
+    }
+
+    public function followings(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+
+    }
+
+    public function follow($user_ids)
+    {
+        if ( ! is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->sync($user_ids, false);
+    }
+
+    public function unfollow($user_ids)
+    {
+        if ( ! is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
+    }
+
+    public function isFollowing($user_id)
+    {
+        return $this->followings->contains($user_id);
     }
 
 }
